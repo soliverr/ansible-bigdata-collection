@@ -1,0 +1,121 @@
+---
+# Common configuration process for Big Data stack
+
+- name: "BIGDATA CONFIG| Create common directories"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ bigdata_owner }}"
+    group: "{{ bigdata_group }}"
+  with_items:
+    - "{{ bigdata_etc_dir }}"
+    - "{{ bigdata_log_dir }}"
+  when:
+    - bigdata_etc_dir | length > 0
+    - bigdata_log_dir | length > 0
+
+- name: "BIGDATA CONFIG| Check original configuration backup"
+  ansible.builtin.stat:
+    path: "{{ bigdata_install_dir }}/conf.orig"
+  register: _bigdata_conf_backup
+  when: bigdata_install_dir | length > 0
+
+- name: "BIGDATA CONFIG| Backup pristine configuration"
+  block:
+    - name: "BIGDATA CONFIG BLOCK| Save current configuration"
+      ansible.builtin.copy:
+        src: "{{ bigdata_configuration_pristine_dir }}/"
+        dest: "{{ bigdata_configuration_pristine_dir }}.orig/"
+        owner: "{{ bigdata_owner }}"
+        group: "{{ bigdata_group }}"
+        mode: "0755"
+        remote_src: true
+        directory_mode: true
+    - name: "BIGDATA CONFIG BLOCK| Drop pristine configuration"
+      ansible.builtin.file:
+        path: "{{ bigdata_configuration_pristine_dir }}"
+        state: absent
+  when:
+    - bigdata_configuration_pristine_dir | length > 0
+    - bigdata_install_dir | length > 0
+    - not _bigdata_conf_backup.stat.exists
+
+- name: "BIGDATA CONFIG| Create configuration symlinks"
+  block:
+    # 'conf' should always point to current stack configuration
+  - name: "BIGDATA CONFIG SYMLINK| Create default configuration symlink"
+    ansible.builtin.file:
+      src: "{{ bigdata_etc_dir }}"
+      dest: "{{ bigdata_configuration_base_dir }}/conf"
+      state: link
+    # create symlink in distribution tree
+  - name: "BIGDATA CONFIG SYMLINK| Create configuration symlink into distribution tree"
+    ansible.builtin.file:
+      src: "{{ bigdata_configuration_base_dir }}/conf"
+      dest: "{{ bigdata_configuration_pristine_dir }}"
+      state: link
+  when:
+    - bigdata_configuration_base_dir | length > 0
+    - bigdata_etc_dir | length > 0
+
+# copy pristine configuration if needed
+- name: "BIGDATA CONFIG| Copy files from backuped pristine configuration"
+  block:
+    - name: "BIGDATA CONFIG PRISTINE| Find configuration files"
+      ansible.builtin.find:
+        paths: "{{ bigdata_configuration_pristine_dir }}.orig"
+        patterns: "{{ bigdata_configuration_pristine_patterns }}"
+      register: _bigdata_pristine_config_files
+    - name: "BIGDATA CONFIG PRISTINE| Copy configuration file"
+      ansible.builtin.copy:
+        src: "{{ item.path }}"
+        dest: "{{ bigdata_etc_dir }}/"
+        owner: "{{ bigdata_owner }}"
+        group: "{{ bigdata_group }}"
+        remote_src: true
+      loop: "{{ _bigdata_pristine_config_files.files|flatten(levels=1) }}"
+      loop_control:
+        label: "{{ item.path }}"
+  when:
+    - bigdata_configuration_pristine_dir | length > 0
+    - bigdata_etc_dir | length > 0
+    - bigdata_configuration_pristine_copy
+
+# create system wide profile environment
+- name: "BIGDATA CONFIG| Setup system wide environment in /etc/profile.d/"
+  ansible.builtin.template:
+    src: "{{ bigdata_profile_template }}"
+    dest: "/etc/profile.d/{{ bigdata_profile_name }}"
+    mode: 0644
+    owner: root
+    group: root
+    force: true
+  when:
+    - bigdata_profile_name | length > 0
+    - bigdata_profile_template | length > 0
+    - bigdata_service_set_default
+
+- name: "BIGDATA CONFIG| Manage log4j.properties from template"
+  ansible.builtin.template:
+    src: "{{ bigdata_log4j_template }}"
+    dest: "{{ bigdata_etc_dir }}/log4j.properties"
+    owner: "{{ bigdata_owner }}"
+    group: "{{ bigdata_group }}"
+    mode: '0664'
+    force: true
+  when: 
+    - bigdata_log4j_template | length > 0
+    - bigdata_etc_dir | length > 0
+
+- name: "BASE CONFIG| Manage '{{ bigdata_env_name }}' environment file from template"
+  ansible.builtin.template:
+    src: "{{ bigdata_env_template }}"
+    dest: "{{ bigdata_etc_dir }}/{{ bigdata_env_name }}"
+    owner: "{{ bigdata_owner }}"
+    group: "{{ bigdata_group }}"
+    mode: '0755'
+    force: true
+  when:
+    - bigdata_etc_dir | length > 0
+    - bigdata_env_template | length > 0
+    - bigdata_env_name | length > 0

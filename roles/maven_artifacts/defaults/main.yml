@@ -1,0 +1,17 @@
+---
+# Default destination to install artifacts
+maven_default_dest_dir: "/tmp"
+
+# Artifacts should be defined as follows:
+#
+#  maven_artifacts:
+#    - name: postgresql-jdbc
+#      group_id: org.postgresql
+#      artifact_id: postgresql
+#      version: 42.2.19
+#      dest_dir: <path>
+#      user: <user>
+#      group: <group>
+#      mode: <mode>
+#    - name: ...
+maven_artifacts: []

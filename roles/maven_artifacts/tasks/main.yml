@@ -1,0 +1,27 @@
+---
+# Create destination directories and install artifacts
+
+- name: "BIGDATA MAVEN| Ensure all destination directories exists"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  loop: "{{ maven_artifacts | selectattr('dest_dir', 'defined') | list | union([maven_default_dest_dir]) | unique  }}"
+  when: maven_artifacts is iterable
+
+- name: "BIGDATA MAVEN| Install Maven artifacts"
+  community.general.maven_artifact:
+    group_id: "{{ item.group_id }}"
+    artifact_id: "{{ item.artifact_id }}"
+    version: "{{ item.version }}"
+    repository_url: "{{ maven_repo_url | default(omit) }}"
+    dest: "{{ item.dest_dir | default(maven_default_dest_dir) }}/{{ item.name }}-{{ item.version }}.jar"
+    state: "{{ item.state | default(omit) }}"
+    owner: "{{ item.user | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default(644) }}"
+  with_items: "{{ maven_artifacts }}"
+  when: maven_artifacts is iterable
+

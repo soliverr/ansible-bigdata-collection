@@ -1,0 +1,52 @@
+---
+# Default user and group for configuration
+bigdata_owner: "root"
+bigdata_group: "root"
+
+# Default installation directory
+# e.g. '/opt/hadoop/3.3.3'
+bigdata_install_dir: ""
+
+# Default pristine configuration catalog in distribution tree
+# e.g. '/opt/hadoop/3.3.3/etc/hadoop'
+bigdata_configuration_pristine_dir: ""
+
+# Default flag to control copying pristine configuration files
+bigdata_configuration_pristine_copy: false
+
+# Default templates for finding pristine configuration files
+bigdata_configuration_pristine_patterns:
+  - '*.xml'
+  - '*.properties'
+
+# Default configuration base directory
+# e.g. '/etc/hadoop'
+bigdata_configuration_base_dir: "/etc"
+
+# Default configuration directory
+# e.g. '/opt/hadoop/3.3.3'
+bigdata_etc_dir: ""
+
+# Default log dir
+# e.g. '/var/log/hadoop/3.3.3'
+bigdata_log_dir: "/var/log"
+
+# Default system wide profile name to put into '/etc/profile.d'
+# e.g. 'hadoop.sh'
+bigdata_profile_name: ""
+
+# Default flag to create or not system wide profile environment
+bigdata_service_set_default: false
+
+# Default template to generate system wide profile into '/etc/profile.d'
+bigdata_profile_template: ""
+
+# Default template to generate log4j.properties
+bigdata_log4j_template: ""
+
+# Default template to generate environment file
+bigdata_env_template: ""
+
+# Default name for environment file
+# e.g. 'hadoop-env.sh'
+bigdata_env_name: ""

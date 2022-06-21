@@ -1,0 +1,10 @@
+---
+# Default user and group for distribution
+bigdata_owner: "root"
+bigdata_group: "root"
+
+# Default installation directory
+bigdata_install_dir: ""
+
+# Default URL to download distribution
+bigdata_url: ""

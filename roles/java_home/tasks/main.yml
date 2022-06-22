@@ -1,0 +1,6 @@
+---
+# tasks file for java_home
+- name: "JAVA_HOME| Find system Java HOME for '{{ java_version }}'"
+  java_home:
+    version: "{{ java_version }}"
+  register: java_home_dir

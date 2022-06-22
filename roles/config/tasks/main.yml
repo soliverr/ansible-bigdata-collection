@@ -22,7 +22,7 @@
 
 - name: "BIGDATA CONFIG| Backup pristine configuration"
   block:
-    - name: "BIGDATA CONFIG BLOCK| Save current configuration"
+    - name: "BIGDATA CONFIG BLOCK| Backup pristine configuration"
       ansible.builtin.copy:
         src: "{{ bigdata_configuration_pristine_dir }}/"
         dest: "{{ bigdata_configuration_pristine_dir }}.orig/"
@@ -40,23 +40,6 @@
     - bigdata_install_dir | length > 0
     - not _bigdata_conf_backup.stat.exists
 
-- name: "BIGDATA CONFIG| Create configuration symlinks"
-  block:
-    # 'conf' should always point to current stack configuration
-  - name: "BIGDATA CONFIG SYMLINK| Create default configuration symlink"
-    ansible.builtin.file:
-      src: "{{ bigdata_etc_dir }}"
-      dest: "{{ bigdata_configuration_base_dir }}/conf"
-      state: link
-    # create symlink in distribution tree
-  - name: "BIGDATA CONFIG SYMLINK| Create configuration symlink into distribution tree"
-    ansible.builtin.file:
-      src: "{{ bigdata_configuration_base_dir }}/conf"
-      dest: "{{ bigdata_configuration_pristine_dir }}"
-      state: link
-  when:
-    - bigdata_configuration_base_dir | length > 0
-    - bigdata_etc_dir | length > 0
 
 # copy pristine configuration if needed
 - name: "BIGDATA CONFIG| Copy files from backuped pristine configuration"
@@ -80,6 +63,26 @@
     - bigdata_configuration_pristine_dir | length > 0
     - bigdata_etc_dir | length > 0
     - bigdata_configuration_pristine_copy
+
+# create system wide configuration symlink
+- name: "BIGDATA CONFIG| Create configuration symlinks"
+  block:
+    # 'conf' should always point to current stack configuration
+  - name: "BIGDATA CONFIG SYMLINK| Create default configuration symlink"
+    ansible.builtin.file:
+      src: "{{ bigdata_etc_dir }}"
+      dest: "{{ bigdata_configuration_base_dir }}/conf"
+      state: link
+    # create symlink in distribution tree
+  - name: "BIGDATA CONFIG SYMLINK| Create configuration symlink into distribution tree"
+    ansible.builtin.file:
+      src: "{{ bigdata_configuration_base_dir }}/conf"
+      dest: "{{ bigdata_configuration_pristine_dir }}"
+      state: link
+  when:
+    - bigdata_configuration_base_dir | length > 0
+    - bigdata_etc_dir | length > 0
+    - bigdata_service_set_default
 
 # create system wide profile environment
 - name: "BIGDATA CONFIG| Setup system wide environment in /etc/profile.d/"

@@ -1,7 +1,7 @@
 ---
 # Common installation process for BigData stack
 
-- name: "BIGDATA INSTALL| Install system dependencies"
+- name: "BIGDATA INSTALL| Install system dependencies {{ bigdata_task_suffix }}"
   ansible.builtin.package:
     name: "{{ bigdata_system_dependencies }}"
     state: present
@@ -11,15 +11,15 @@
     path: "{{ bigdata_install_dir }}/bin"
   register: _bigdata_install_dir
 
-- name: "BIGDATA INSTALL| Install distribution"
+- name: "BIGDATA INSTALL| Install distribution {{ bigdata_task_suffix }}"
   block:
-    - name: "BIGDATA INSTALL BLOCK| Create installation dir"
+    - name: "BIGDATA INSTALL BLOCK| Create installation dir {{ bigdata_task_suffix }}"
       ansible.builtin.file:
         path: "{{ bigdata_install_dir }}"
         state: directory
         owner: "{{ bigdata_owner }}"
         group: "{{ bigdata_group }}"
-    - name: "BIGDATA INSTALL BLOCK| Unarchive distribution"
+    - name: "BIGDATA INSTALL BLOCK| Unarchive distribution {{ bigdata_task_suffix }}"
       ansible.builtin.unarchive:
         extra_opts: ['--strip-components=1']
         src: "{{ bigdata_url }}"

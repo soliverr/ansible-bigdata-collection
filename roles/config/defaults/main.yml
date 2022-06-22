@@ -1,4 +1,7 @@
 ---
+# Default suffix added to collection's tasks
+bigdata_task_suffix: ""
+
 # Default user and group for configuration
 bigdata_owner: "root"
 bigdata_group: "root"

@@ -1,7 +1,7 @@
 ---
 # Common configuration process for Big Data stack
 
-- name: "BIGDATA CONFIG| Create common directories {{ bigdata_task_suffix }"
+- name: "BIGDATA CONFIG {{ bigdata_task_suffix }}| Create common directories"
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -14,15 +14,15 @@
     - bigdata_etc_dir | length > 0
     - bigdata_log_dir | length > 0
 
-- name: "BIGDATA CONFIG| Check original configuration backup {{ bigdata_task_suffix }"
+- name: "BIGDATA CONFIG {{ bigdata_task_suffix }}| Check original configuration backup"
   ansible.builtin.stat:
     path: "{{ bigdata_install_dir }}/conf.orig"
   register: _bigdata_conf_backup
   when: bigdata_install_dir | length > 0
 
-- name: "BIGDATA CONFIG| Backup pristine configuration {{ bigdata_task_suffix }"
+- name: "BIGDATA CONFIG {{ bigdata_task_suffix }}| Backup pristine configuration"
   block:
-    - name: "BIGDATA CONFIG BLOCK| Backup pristine configuration {{ bigdata_task_suffix }"
+    - name: "BIGDATA CONFIG BLOCK {{ bigdata_task_suffix }}| Backup pristine configuration"
       ansible.builtin.copy:
         src: "{{ bigdata_configuration_pristine_dir }}/"
         dest: "{{ bigdata_configuration_pristine_dir }}.orig/"
@@ -31,7 +31,7 @@
         mode: "0755"
         remote_src: true
         directory_mode: true
-    - name: "BIGDATA CONFIG BLOCK| Drop pristine configuration {{ bigdata_task_suffix }"
+    - name: "BIGDATA CONFIG BLOCK {{ bigdata_task_suffix }}| Drop pristine configuration"
       ansible.builtin.file:
         path: "{{ bigdata_configuration_pristine_dir }}"
         state: absent
@@ -42,14 +42,14 @@
 
 
 # copy pristine configuration if needed
-- name: "BIGDATA CONFIG| Copy files from backed up pristine configuration {{ bigdata_task_suffix }"
+- name: "BIGDATA CONFIG| Copy files from backed up pristine configuration"
   block:
-    - name: "BIGDATA CONFIG PRISTINE| Find configuration files {{ bigdata_task_suffix }"
+    - name: "BIGDATA CONFIG PRISTINE {{ bigdata_task_suffix }}| Find configuration files"
       ansible.builtin.find:
         paths: "{{ bigdata_configuration_pristine_dir }}.orig"
         patterns: "{{ bigdata_configuration_pristine_patterns }}"
       register: _bigdata_pristine_config_files
-    - name: "BIGDATA CONFIG PRISTINE| Copy configuration file {{ bigdata_task_suffix }"
+    - name: "BIGDATA CONFIG PRISTINE {{ bigdata_task_suffix }}| Copy configuration file"
       ansible.builtin.copy:
         src: "{{ item.path }}"
         dest: "{{ bigdata_etc_dir }}/"
@@ -65,16 +65,16 @@
     - bigdata_configuration_pristine_copy
 
 # create system wide configuration symlink
-- name: "BIGDATA CONFIG| Create configuration symlinks {{ bigdata_task_suffix }"
+- name: "BIGDATA CONFIG {{ bigdata_task_suffix }}| Create configuration symlinks"
   block:
     # 'conf' should always point to current stack configuration
-  - name: "BIGDATA CONFIG SYMLINK| Create default configuration symlink {{ bigdata_task_suffix }"
+  - name: "BIGDATA CONFIG SYMLINK {{ bigdata_task_suffix }}| Create default configuration symlink"
     ansible.builtin.file:
       src: "{{ bigdata_etc_dir }}"
       dest: "{{ bigdata_configuration_base_dir }}/conf"
       state: link
     # create symlink in distribution tree
-  - name: "BIGDATA CONFIG SYMLINK| Create configuration symlink into distribution tree {{ bigdata_task_suffix }"
+  - name: "BIGDATA CONFIG SYMLINK {{ bigdata_task_suffix }}| Create configuration symlink into distribution tree"
     ansible.builtin.file:
       src: "{{ bigdata_configuration_base_dir }}/conf"
       dest: "{{ bigdata_configuration_pristine_dir }}"
@@ -85,7 +85,7 @@
     - bigdata_service_set_default
 
 # create system wide profile environment
-- name: "BIGDATA CONFIG| Setup system wide environment in /etc/profile.d/ {{ bigdata_task_suffix }"
+- name: "BIGDATA CONFIG {{ bigdata_task_suffix }}| Setup system wide environment in /etc/profile.d/"
   ansible.builtin.template:
     src: "{{ bigdata_profile_template }}"
     dest: "/etc/profile.d/{{ bigdata_profile_name }}"
@@ -98,7 +98,7 @@
     - bigdata_profile_template | length > 0
     - bigdata_service_set_default
 
-- name: "BIGDATA CONFIG| Manage log4j.properties from template {{ bigdata_task_suffix }"
+- name: "BIGDATA CONFIG {{ bigdata_task_suffix }}| Manage log4j.properties from template"
   ansible.builtin.template:
     src: "{{ bigdata_log4j_template }}"
     dest: "{{ bigdata_etc_dir }}/log4j.properties"
@@ -110,7 +110,7 @@
     - bigdata_log4j_template | length > 0
     - bigdata_etc_dir | length > 0
 
-- name: "BASE CONFIG| Manage '{{ bigdata_env_name }}' environment file from template {{ bigdata_task_suffix }"
+- name: "BASE CONFIG {{ bigdata_task_suffix }}| Manage '{{ bigdata_env_name }}' environment file from template"
   ansible.builtin.template:
     src: "{{ bigdata_env_template }}"
     dest: "{{ bigdata_etc_dir }}/{{ bigdata_env_name }}"

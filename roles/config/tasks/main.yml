@@ -101,13 +101,14 @@
 - name: "BIGDATA CONFIG {{ bigdata_task_suffix }}| Manage log4j.properties from template"
   ansible.builtin.template:
     src: "{{ bigdata_log4j_template }}"
-    dest: "{{ bigdata_etc_dir }}/log4j.properties"
+    dest: "{{ bigdata_etc_dir }}/{{ bigdata_log4j_name }}"
     owner: "{{ bigdata_owner }}"
     group: "{{ bigdata_group }}"
     mode: '0664'
     force: true
   when: 
     - bigdata_log4j_template | length > 0
+    - bigdata_log4j_name | length > 0
     - bigdata_etc_dir | length > 0
 
 - name: "BASE CONFIG {{ bigdata_task_suffix }}| Manage '{{ bigdata_env_name }}' environment file from template"

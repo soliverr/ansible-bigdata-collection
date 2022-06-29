@@ -47,9 +47,11 @@ bigdata_profile_template: ""
 # Default template to generate log4j.properties
 bigdata_log4j_template: ""
 
+# Default name for log4j properties file, e.g. 'log4j.properties'
+bigdata_log4j_name: ""
+
 # Default template to generate environment file
 bigdata_env_template: ""
 
-# Default name for environment file
-# e.g. 'hadoop-env.sh'
+# Default name for environment file, e.g. 'hadoop-env.sh'
 bigdata_env_name: ""

@@ -98,7 +98,7 @@
     - bigdata_profile_template | length > 0
     - bigdata_service_set_default
 
-- name: "BIGDATA CONFIG {{ bigdata_task_suffix }}| Manage log4j.properties from template"
+- name: "BIGDATA CONFIG {{ bigdata_task_suffix }}| Manage '{{ bigdata_log4j_name }}' from template"
   ansible.builtin.template:
     src: "{{ bigdata_log4j_template }}"
     dest: "{{ bigdata_etc_dir }}/{{ bigdata_log4j_name }}"

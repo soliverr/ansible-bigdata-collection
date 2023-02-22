@@ -111,6 +111,31 @@
     - bigdata_log4j_name | length > 0
     - bigdata_etc_dir | length > 0
 
+- name: "BASE CONFIG {{ bigdata_task_suffix }}| Manage '{{ bigdata_system_env_name }}' environment file from template"
+  block:
+    - name: "BASE CONFIG BLOCK {{ bigdata_task_suffix }}| Get systemd configuration directory"
+      ansible.builtin.stat:
+        path: "/etc/sysconfig"
+      register: _bigdata_sysconfig
+    - name: "BASE CONFIG BLOCK {{ bigdata_task_suffix }}| Manage '{{ bigdata_system_env_name }}' environment file"
+      ansible.builtin.template:
+        src: "{{ bigdata_system_env_template }}"
+        dest: "{{ bigdata_etc_dir }}/{{ bigdata_system_env_name }}"
+        owner: "{{ bigdata_owner }}"
+        group: "{{ bigdata_group }}"
+        mode: '0755'
+        force: true
+    - name: "BASE CONFIG BLOCK {{ bigdata_task_suffix }}| Manage '/etc/sysconfig/{{ bigdata_system_name }}' systemd link"
+      ansible.builtin.file:
+        src: "{{ bigdata_etc_dir }}/{{ bigdata_system_env_name }}"
+        dest: "{{ (_bigdata_sysconfig.stat.exists) | ternary('/etc/sysconfig', '/etc/default') }}/{{ bigdata_system_name }}"
+        state: link
+  when:
+    - bigdata_etc_dir | length > 0
+    - bigdata_system_env_template | length > 0
+    - bigdata_system_env_name | length > 0
+    - bigdata_system_name | length > 0
+
 - name: "BASE CONFIG {{ bigdata_task_suffix }}| Manage '{{ bigdata_env_name }}' environment file from template"
   ansible.builtin.template:
     src: "{{ bigdata_env_template }}"
@@ -123,3 +148,5 @@
     - bigdata_etc_dir | length > 0
     - bigdata_env_template | length > 0
     - bigdata_env_name | length > 0
+
+  

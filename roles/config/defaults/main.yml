@@ -55,3 +55,12 @@ bigdata_env_template: ""
 
 # Default name for environment file, e.g. 'hadoop-env.sh'
 bigdata_env_name: ""
+
+# Default template to generate systemd environment file
+bigdata_system_env_template: ""
+
+# Default name for system environment file, e.g. 'hadoop-system-env.sh'
+bigdata_system_env_name: ""
+
+# Defaukt name for systemd in /etc/sysconfig, e.g. 'hadoop-3.3'
+bigdata_system_name: ""
